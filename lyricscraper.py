@@ -26,7 +26,7 @@ from bs4 import BeautifulSoup as bs
 import datetime
 
 
-# In[13]:
+# In[36]:
 
 
 # function that retrieves a song's information
@@ -68,10 +68,10 @@ def get_song(song_artist, song_title):
     # extracting the release date
     for span in soup.findAll('span', attrs = {'class': 'metadata_unit-info metadata_unit-info--text_only'}):
         try:
-            song["Release Date"] = datetime.datetime.strftime(datetime.datetime.strptime(str(span.text.strip()), "%B %d, %Y"), 
-                                                              "%Y-%m-%d")
+            song["Release Date"] = [datetime.datetime.strftime(datetime.datetime.strptime(str(span.text.strip()), "%B %d, %Y"), 
+                                                              "%Y-%m-%d")]
         except:
-            song["Release Date"] = "unknown"
+            song["Release Date"] = ["unknown"]
 
     # extracting the album
     for a in soup.findAll('a', attrs = {'class': 'song_album-info-title'}):
