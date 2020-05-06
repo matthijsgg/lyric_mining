@@ -23,3 +23,11 @@ Be aware that the url of some songs or albums is not directly similar to the tit
 
 
 Sometimes an album on Genius.com contains an item like an alternative album cover, instead of a song. These items don't have any lyrics, and will therefore not generate any song info when used in ```get_song()```.
+
+Dependencies of this module are
+- BeautifulSoup
+- requests
+- datetime
+- numpy
+- pandas
+- re
