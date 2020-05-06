@@ -95,15 +95,16 @@ def get_album(album_artist, album_title):
     return album_songs
 
 
-# In[ ]:
+# In[34]:
 
 
-# seperating all the words in the song lyrics in a seperate list. Also includes notations about who sings the song, 
-# and what part of the song it is.
+# seperating all the words in the song lyrics in a seperate list. 
 
-def sep_words(song_nr):
+def sep_words(song_dict, song_nr = 0):
     wordlist = []
-    for line in song["Lyrics"][song_nr]:
+    for line in song_dict["Lyrics"][song_nr]:
+        if len(line) > 0 and line[0] == '[': # rule to remove all lines that are informational, and not actual lyrics
+            continue
         for word in line.split():
             wordlist.append(re.sub(r'\W+', '', word).lower())  # removing non-alphanumerical characters and making it all lowercase
 
