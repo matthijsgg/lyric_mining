@@ -27,7 +27,7 @@ Because ```request.get``` sometimes returns a page that does not contain any lyr
 
 If the function is used bare, it will look up the lyrics to _All of the light_ by _Kanye West_.
 
-## getting lyrics from an album
+## getting song titles from an album
 To retrieve the titles from all songs on an album, ```get_album(album_artist = "Kanye West", album_title = "My beautiful dark twisted fantasy", album_url = None)``` is used. 
 Similarly to ```get_song()```, it can be used in 2 ways:
 - __using ```album_artist``` and ```album_title```:__ <br>
@@ -39,7 +39,7 @@ The function ```get_album()``` outputs a list that contains strings which are th
 
 To get the lyrics to songs from an entire album, you can use the function ```get_album()``` to select an artist and an album, and then use a for-loop that uses ```get_song()``` for every song in the list created by ```album_songs()```. The easiest way to include multiple songs in one dictionary is by creating a master dictionary, and update the lists in the master dictionary with the data generated in the ```get_song()``` dictionary.
 
-## counting unique words
+## counting the frequency of unique words in the lyrics of a song
 To retrieve all individual words used on a song, complemented with their frequency count, ```sep_words(song_dict, song_nr = 0)``` is used. 
 ```song_dict``` is used to define the variable where you stored the dictionary generated in ```get_song```. 
 Optional argument ```song_nr``` indexes the lyrics in ```song_dict["Lyrics"]```. If unused, it refers to the first entry of the dictionary.
