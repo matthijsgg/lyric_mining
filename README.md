@@ -21,7 +21,7 @@ The lyrics of the song that was parsed from the url
 - __\["Release Date"]:__ <br>
 The release date of the song that was parsed from the url
 
-Because ```request.get``` sometimes returns a page that does not contain any lyrics, it will try up to 5 times whenever this happens. If no lyrics are found after 5 tries, the function return a dictionary with empty lists.
+Because ```request.get``` sometimes returns a page that does not contain any lyrics, it will try up to 5 times whenever this happens. If no lyrics are found after 5 tries, the function return a dictionary with empty lists. This maximum is set up to prevent the user from getting stuck in a while-loop when the url does not contain any lyrics.
 
 ```song_url``` has priority over ```song_artist``` and ```song_title```. If you enter all 3, you will always get the song entered in ```song_url```. 
 
