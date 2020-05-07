@@ -1,4 +1,4 @@
-# lyricscrapper.py
+# lyricscraper.py
 Scraps lyrics from songs on Genius.com using, among other modules, the BeautifulSoup library in Python.
 
 ## getting lyrics for a song
