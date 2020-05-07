@@ -7,7 +7,7 @@
 # 
 # Next, the data can be used to create charts that, for example, define the amount of times a specific word is said.
 
-# In[3]:
+# In[2]:
 
 
 # standard libraries
@@ -16,7 +16,7 @@ import pandas as pd
 import re
 
 
-# In[4]:
+# In[3]:
 
 
 # including libraries for web scraping
@@ -26,15 +26,17 @@ from bs4 import BeautifulSoup as bs
 import datetime
 
 
-# In[36]:
+# In[86]:
 
 
 # function that retrieves a song's information
-
-def get_song(song_artist, song_title):
-    song_url = "https://genius.com/{}-{}-lyrics".format(re.sub(r'\W+', ' ', song_artist).replace(' ', '-'), 
+def get_song(song_artist = "Kanye West", song_title = "All of the lights", song_url = None):
+    if song_url == None:
+        song_url = "https://genius.com/{}-{}-lyrics".format(re.sub(r'\W+', ' ', song_artist).replace(' ', '-'), 
                                                             re.sub(r'\W+', ' ', song_title).replace(' ', '-'))
-    
+    else:
+        song_url = song_url
+        
     # creating a dict to store the title, lyrics and comments on the song
     song = {}
     song["Artist"] = []
@@ -43,28 +45,37 @@ def get_song(song_artist, song_title):
     song["Release Date"] = []
     song["Album"] = []
     
-    if song_artist[-1] == ' ':
-        song_artist = song_artist[0:-1]
-    if song_title[-1] == ' ':
-        song_title = song_title[0:-1]
+    # removing trailing spaces
+    while song_artist[-1] == ' ':
+        song_artist = song_artist[:-1]
+    while song_artist[0] == ' ':
+        song_artist = song_artist[1:]
+    while song_title[-1] == ' ':
+        song_title = song_title[:-1]
+    while song_title[0] == ' ':
+        song_title = song_title[1:]
     
-    try:
-        res = requests.get(song_url)
+    nth_try = 1
+    while song["Lyrics"] == []: 
+        # requesting the url and parsing the data
+        res = requests.get(song_url, timeout = 5)
         soup = bs(res.content, 'html.parser')
-    
-    except:
-        print "url {} not found".format(song_url)
+
+        # extracting the lyrics
+        for div in soup.findAll('div', attrs = {'class': 'lyrics'}):
+            song["Lyrics"].append(div.text.strip().split("\n"))
+        if nth_try == 5:
+            print "tried 5 times, didn't find any lyrics. Skipping this song."
+            return song
+        if song["Lyrics"] == []:
+            print "no lyrics found for {}, {} times tried. Trying again;".format(song_title, nth_try)
+            nth_try += 1
 
     # extracting the artist, title and release date
     for song_title in soup.findAll('title'):
         song_title = song_title.text.strip()
-    song["Artist"].append(song_title.split(u"\u2013")[0].encode('ascii', 'replace').replace("?", ' '))
-    song["Title"].append(song_title.split(u"\u2013")[1].split("Lyrics")[0].encode('ascii', 'replace').replace("?", ' '))
-
-    # extracting the lyrics
-    for div in soup.findAll('div', attrs = {'class': 'lyrics'}):
-        song["Lyrics"].append(div.text.strip().split("\n"))
-
+    song["Artist"].append(song_title.split(u"\u2013")[0].encode('ascii', 'replace').replace("?", ' ').strip())
+    song["Title"].append(song_title.split(u"\u2013")[1].split("Lyrics")[0].encode('ascii', 'replace').replace("?", ' ').strip())
     # extracting the release date
     for span in soup.findAll('span', attrs = {'class': 'metadata_unit-info metadata_unit-info--text_only'}):
         try:
@@ -80,7 +91,7 @@ def get_song(song_artist, song_title):
     return song
 
 
-# In[ ]:
+# In[74]:
 
 
 def get_album(album_artist, album_title): 
@@ -90,16 +101,20 @@ def get_album(album_artist, album_title):
     album_songs = []
     
     for div in soup.findAll('h3', attrs = {'class': 'chart_row-content-title'}):
-            album_songs.append(str(div.text.strip().encode('ascii', 'replace').replace("?", ' ').split("\n")[0].split("(")[0]))
-            
+        album_songs.append(str(div.text.strip().encode('ascii', 'replace').replace("?", ' ').split("\n")[0].split("(")[0]))
+         
+        for song, i in enumerate(album_songs): # removing all whitespace trailing in song titles to prevent getting wrong urls.
+            while album_songs[song][0] == " ":
+                album_songs[song] = album_songs[song][1:]
+            while album_songs[song][-1] == " ":
+                album_songs[song] = album_songs[song][:-1]
     return album_songs
 
 
-# In[34]:
+# In[39]:
 
 
 # seperating all the words in the song lyrics in a seperate list. 
-
 def sep_words(song_dict, song_nr = 0):
     wordlist = []
     for line in song_dict["Lyrics"][song_nr]:
@@ -108,9 +123,11 @@ def sep_words(song_dict, song_nr = 0):
         for word in line.split():
             wordlist.append(re.sub(r'\W+', '', word).lower())  # removing non-alphanumerical characters and making it all lowercase
 
-    wordframe = pd.DataFrame(columns = ["word", "count"])
+    wordframe = pd.DataFrame(columns = ["word", "count", "song", "album", "artist"])
 
     for word in np.unique(wordlist):
-        wordframe = wordframe.append(pd.DataFrame([[word, wordlist.count(word)]], columns = ["word", "count"]))
+        wordframe = wordframe.append(pd.DataFrame([[word, wordlist.count(word), song_dict["Title"][song_nr], 
+                                                    song_dict["Album"][song_nr], song_dict["Artist"][song_nr]]], 
+                                                  columns = ["word", "count", "song", "album", "artist"]))
     return wordframe
 
