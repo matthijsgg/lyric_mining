@@ -91,11 +91,14 @@ def get_song(song_artist = "Kanye West", song_title = "All of the lights", song_
     return song
 
 
-# In[74]:
+# In[88]:
 
 
-def get_album(album_artist, album_title): 
-    album_url = "https://genius.com/albums/{}/{}".format(album_artist.replace(" ", "-"), album_title.replace(" ", "-"))
+def get_album(album_artist = "Kanye West", album_title = "My beautiful dark twisted fantasy", album_url = None): 
+    if album_url is None:
+        album_url = "https://genius.com/albums/{}/{}".format(album_artist.replace(" ", "-"), album_title.replace(" ", "-"))
+    else:
+        album_url = album_url
     res = requests.get(album_url)
     soup = bs(res.content, "html.parser")
     album_songs = []
