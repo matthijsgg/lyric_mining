@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # Scraping lyrics from Genius.com
@@ -7,7 +7,7 @@
 # 
 # Next, the data can be used to create charts that, for example, define the amount of times a specific word is said.
 
-# In[2]:
+# In[15]:
 
 
 # standard libraries
@@ -16,7 +16,7 @@ import pandas as pd
 import re
 
 
-# In[3]:
+# In[16]:
 
 
 # including libraries for web scraping
@@ -26,7 +26,7 @@ from bs4 import BeautifulSoup as bs
 import datetime
 
 
-# In[86]:
+# In[111]:
 
 
 # function that retrieves a song's information
@@ -65,17 +65,17 @@ def get_song(song_artist = "Kanye West", song_title = "All of the lights", song_
         for div in soup.findAll('div', attrs = {'class': 'lyrics'}):
             song["Lyrics"].append(div.text.strip().split("\n"))
         if nth_try == 5:
-            print "tried 5 times, didn't find any lyrics. Skipping this song."
+            print("tried 5 times, didn't find any lyrics. Skipping this song.")
             return song
         if song["Lyrics"] == []:
-            print "no lyrics found for {}, {} times tried. Trying again;".format(song_title, nth_try)
+            print("no lyrics found for {}, {} times tried. Trying again;".format(song_title, nth_try))
             nth_try += 1
 
     # extracting the artist, title and release date
     for song_title in soup.findAll('title'):
         song_title = song_title.text.strip()
-    song["Artist"].append(song_title.split(u"\u2013")[0].encode('ascii', 'replace').replace("?", ' ').strip())
-    song["Title"].append(song_title.split(u"\u2013")[1].split("Lyrics")[0].encode('ascii', 'replace').replace("?", ' ').strip())
+    song["Artist"].append(song_title.split(u"\u2013")[0].encode('ascii', 'replace').decode('utf-8').replace("?", ' ').strip())
+    song["Title"].append(song_title.split(u"\u2013")[1].split("Lyrics")[0].encode('ascii', 'replace').decode('utf-8').replace("?", ' ').strip())
     # extracting the release date
     for span in soup.findAll('span', attrs = {'class': 'metadata_unit-info metadata_unit-info--text_only'}):
         try:
@@ -86,12 +86,12 @@ def get_song(song_artist = "Kanye West", song_title = "All of the lights", song_
 
     # extracting the album
     for a in soup.findAll('a', attrs = {'class': 'song_album-info-title'}):
-        song["Album"].append(a.text.strip().encode('ascii', 'replace').replace("?", ' '))
+        song["Album"].append(a.text.strip().encode('ascii', 'replace').decode('utf-8').replace("?", ' '))
 
     return song
 
 
-# In[88]:
+# In[105]:
 
 
 def get_album(album_artist = "Kanye West", album_title = "My beautiful dark twisted fantasy", album_url = None): 
@@ -104,7 +104,7 @@ def get_album(album_artist = "Kanye West", album_title = "My beautiful dark twis
     album_songs = []
     
     for div in soup.findAll('h3', attrs = {'class': 'chart_row-content-title'}):
-        album_songs.append(str(div.text.strip().encode('ascii', 'replace').replace("?", ' ').split("\n")[0].split("(")[0]))
+        album_songs.append(div.text.strip().encode('ascii', 'replace').decode('utf-8').replace("?", " ").split("\n")[0].split("(")[0])
          
         for song, i in enumerate(album_songs): # removing all whitespace trailing in song titles to prevent getting wrong urls.
             while album_songs[song][0] == " ":
@@ -114,7 +114,7 @@ def get_album(album_artist = "Kanye West", album_title = "My beautiful dark twis
     return album_songs
 
 
-# In[39]:
+# In[12]:
 
 
 # seperating all the words in the song lyrics in a seperate list. 
